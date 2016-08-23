@@ -19,7 +19,7 @@ This should have created a configuration file at `~/.compose_helper/config` and 
 # Binaries from compose-helper
 export PATH="/home/mbarrientos/.compose_helper/bin:$PATH"
 ```
-Note: Modify path "/home/mbarrientos/.compose_helper/bin" with your actual config directory
+Note: Modify path **/home/mbarrientos/.compose_helper/bin** with your actual config directory.
 
 ## How to use
 Now you can run commands on your docker-compose application easily by typing:

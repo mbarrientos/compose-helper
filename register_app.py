@@ -14,13 +14,17 @@ class RegisterApp:
         self.parser.add_argument("--default", dest="default_service", type=str, default="app", help="default service for run and exec commands")
         self.args = self.parser.parse_args()
 
-    def _mkbinary(self, name, bin_path="/usr/local/bin"):
+    def _mkbinary(self, name, bin_path):
         """
         Creates a new binary in the system with given "name" by creating a symlink to this file.
 
         :param app: name of the binary
         :param bin_path: path where to create the binary
         """
+        if not os.path.exists(bin_path):
+            print("Config directory was not found. Creating at {}".format(bin_path))
+            os.mkdir(bin_path)
+
         target_file = os.path.join(bin_path, name)
         if os.access(bin_path, os.W_OK):
             if not os.path.exists(target_file):
@@ -31,6 +35,12 @@ class RegisterApp:
             raise PermissionError("Permission denied: can't write to {}".format(bin_path))
 
     def _create_config(self, name, project_dir):
+        """
+        Create the config directory and file located at ~/.compose_helper
+
+        :param name: project name
+        :param project_dir: project directory
+        """
         config_dir = os.path.expanduser("~/.compose_helper")
         config_file = "config"
         config_path = os.path.join(config_dir, config_file)
@@ -59,11 +69,11 @@ class RegisterApp:
         app = self.args.app
         project_dir = os.path.join(self.args.path)
 
-        # Creating binary link
-        self._mkbinary(app)
-
         # Adding entry to compose_helper config
         self._create_config(app, project_dir)
+
+        # Creating binary link
+        self._mkbinary(app, os.path.expanduser('~/.compose_helper/bin'))
 
         return 0
 

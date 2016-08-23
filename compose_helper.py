@@ -69,16 +69,6 @@ class ComposeHelper:
         else:
             return os.path.join(self.get_app_path(self.app), "docker-compose.yml")
 
-    def migrate(self):
-        cmd = shlex.split("docker-compose -f {} run migrate".format(self.get_docker_compose()))
-        cmd.extend(self.args.args)
-        return cmd
-
-    def shell(self):
-        cmd = shlex.split("docker-compose -f {} run app shell".format(self.get_docker_compose()))
-        cmd.extend(self.args.args)
-        return cmd
-
     def docker_compose(self, compose_command):
         cmd = shlex.split("docker-compose -f {} {}".format(self.get_docker_compose(), compose_command))
 
@@ -124,7 +114,6 @@ class ComposeHelper:
         else:
             return self.not_found()
 
-        print("[DEBUG] Running: {}".format(shell_commands))
         # Run command
         p = subprocess.Popen(args=shell_commands)
         while p.returncode is None:
