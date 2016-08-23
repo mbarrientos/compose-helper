@@ -25,7 +25,13 @@ Note: Modify path **/home/mbarrientos/.compose_helper/bin** with your actual con
 Now you can run commands on your docker-compose application easily by typing:
 ```
 my_app up -d
-my_app run -it /bin/bash
+my_app exec /bin/bash
+
+# You can specify a different docker-compose YAML file with '-f'
+my_app -f docker-compose-production.yml up -d
+
+# Flag "-s" can be used to target a different service than 'default_service'
+my_app -s postgres tail -f /var/log/postgresql/postgresql.log
 ```
 
 ## Configuration
