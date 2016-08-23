@@ -1,2 +1,33 @@
 # compose-helper
 Util for working with docker-compose projects and generating your own binaries.
+
+## Setup
+* Clone this repository:
+```shell
+git clone https://github.com/mbarrientos/compose-helper
+```
+
+* Run the register_app.py to generate a binary and to setup the configuration for your app:
+```shell
+cd compose-helper
+./register_app.py my_app /path/to/my_app
+```
+This should have created a configuration file at `~/.compose_helper/config` and created a binary called `my_app` at `~/.compose_helper/bin`.
+
+* Add these lines to your shell rc file (bashrc, zshrc, ...) to add the new binaries to PATH:
+```bash
+# Binaries from compose-helper
+export PATH="/home/mbarrientos/.compose_helper/bin:$PATH"
+```
+Note: Modify path "/home/mbarrientos/.compose_helper/bin" with your actual config directory
+
+## How to use
+Now you can run commands on your docker-compose application easily by typing:
+```
+my_app up -d
+my_app run -it /bin/bash
+```
+
+## Configuration
+* **project_dir**: Path to your project.
+* **default_service**: If specified, this will be the target of compose commands such as *run* or *exec*.
