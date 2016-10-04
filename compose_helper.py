@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 import argparse
 import configparser
+import logging
 import os
 import shlex
-
-import sys
-
 import subprocess
+import sys
 
 COMPOSE_SERVICE_SPECIFIC = (
     'exec', 'run', 'scale',
@@ -25,6 +24,34 @@ DEFAULT_CMD = 'up'
 
 CONFIG_DIR = os.path.expanduser('~/.compose_helper')
 CONFIG_FILE_PATH = os.path.join(CONFIG_DIR, 'config')
+
+try:
+    import colorlog
+    log_colors = {
+
+    }
+    handler = colorlog.StreamHandler()
+    handler.setFormatter(colorlog.ColoredFormatter(
+        '%(log_color)s[%(levelname)s] %(message)s',
+        datefmt=None,
+        reset=True,
+        log_colors={
+            'DEBUG': 'cyan',
+            'INFO': 'green',
+            'WARNING': 'yellow',
+            'ERROR': 'red',
+            'CRITICAL': 'red,bg_white',
+        },
+        style='%'
+    ))
+
+    logger = colorlog.getLogger()
+    logger.addHandler(handler)
+
+except ImportError:
+    #  'colorlog' not found, so setting default logger
+    logger = logging.getLogger()
+    logger.addHandler(logging.StreamHandler())
 
 
 class ComposeHelper:
@@ -47,6 +74,10 @@ class ComposeHelper:
 
         self.project_dir = self.config[self.app].get('project_dir', os.getcwd())
         self.default_service = self.config[self.app].get('default_service', None)
+        self.debug = self.config[self.app].get('debug', 'False').lower() in ('true', 't', '1')
+
+        if self.debug:
+            logger.setLevel(logging.DEBUG)
 
         if self.args.service:
             self.service = self.args.service
@@ -71,6 +102,10 @@ class ComposeHelper:
         return app_dir
 
     def get_docker_compose(self):
+        """
+        Build path for docker-compose file within the project.
+        :return:
+        """
         if self.args.compose:
             return self.args.compose
         else:
@@ -121,10 +156,10 @@ class ComposeHelper:
         Helper function when command is not found.
         :return:
         """
-        print("Error: Command {} is not supported.".format(self.args.command))
+        logger.error("Command {} is not supported.".format(self.args.command))
         return -1
 
-    def start(self):
+    def run(self):
         """
         Main method of the CLI. Executes the related command function on app and returns the exit code of the
         instruction.
@@ -138,9 +173,10 @@ class ComposeHelper:
         elif cmd in COMMAND_CHOICES:
             command_f = getattr(self, cmd, None)
             shell_commands = command_f()
-            print(shell_commands)
         else:
             return self.not_found()
+
+        logger.debug("Running: {}".format(shell_commands))
 
         # Run command
         p = subprocess.Popen(args=shell_commands)
@@ -154,4 +190,4 @@ class ComposeHelper:
 
 if __name__ == '__main__':
     cli = ComposeHelper()
-    sys.exit(cli.start())
+    sys.exit(cli.run())

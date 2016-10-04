@@ -37,3 +37,4 @@ my_app -s postgres tail -f /var/log/postgresql/postgresql.log
 ## Configuration
 * **project_dir**: Path to your project.
 * **default_service**: If specified, this will be the target of compose commands such as *run* or *exec*.
+* **debug**: set to `true` to enable debug mode. Defaults to `false`
